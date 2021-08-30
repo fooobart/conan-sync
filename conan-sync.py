@@ -46,7 +46,7 @@ run_conan([], reraise_error=True)
 raw_source_recipes = run_conan(['search', '-r', source_remote, '*'])
 source_recipes = raw_source_recipes.decode('utf8').splitlines()[2:]  # Skip the header lines
 
-package_json = tempfile.NamedTemporaryFile(mode='r', encoding='utf8')
+package_json = tempfile.NamedTemporaryFile(mode='r', encoding='utf8', delete=False)
 
 for source_recipe in source_recipes:
     print(source_recipe)
@@ -78,3 +78,5 @@ for source_recipe in source_recipes:
         run_conan(['remove', '-p', source_package, '-f', source_recipe])
 
     run_conan(['remove', '-f', source_recipe])
+
+os.remove(package_json.name)
