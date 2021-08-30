@@ -2,6 +2,7 @@ import argparse
 import json
 import subprocess
 import sys
+import os
 
 # Parse args
 import tempfile
@@ -71,12 +72,14 @@ for source_recipe in source_recipes:
 
         # Sync package over
         print(": Syncing to remote")
-        run_conan(['download', '-r', source_remote, '-p', source_package, source_recipe])
-        run_conan(['upload', '-r', dest_remote, '-p', source_package, source_recipe], reraise_error=True)
+        run_conan(['download', '-r', source_remote, source_recipe + ':' + source_package])
+        run_conan(['upload', '-r', dest_remote, source_recipe + ':' + source_package], reraise_error=True)
+        
         dest_packages.add(source_package)  # prevent double uploads
         # Clean up so we don't fill the drive
-        run_conan(['remove', '-p', source_package, '-f', source_recipe])
+        run_conan(['remove', '-f', source_recipe + ':' + source_package])
 
     run_conan(['remove', '-f', source_recipe])
 
+package_json.close()
 os.remove(package_json.name)
